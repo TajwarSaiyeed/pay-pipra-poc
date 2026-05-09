@@ -1,20 +1,63 @@
 # PipraPay POC
 
-A Django app integrating **PipraPay** (self-hosted payment automation) with **bKash** and **Nagad** gateways.
+A Django app integrating **PipraPay** (self-hosted payment automation) with **bKash** and **Nagad** gateways. Everything runs on GitHub Codespaces (or any VPS).
 
 ---
 
-## Quick Start (1 Command)
+## Quick Start
 
 ```bash
 git pull origin main && bash start.sh
 ```
 
-Then:
-1. Get API key from **https://demo.piprapay.com/admin/** (login: `demo` / `12345678`)
-2. Copy the API key from **Settings → API Keys**
-3. Update `config.yaml` with your API key
-4. Restart the server
+---
+
+## Setup PipraPay (Self-Hosted)
+
+### Option 1: Docker (Recommended for Codespaces with Docker enabled)
+
+1. Go to **https://github.com/settings/codespaces**
+2. Click **Edit** on your codespace
+3. Enable **Docker in Codespaces**
+4. Recreate the codespace
+
+Then run `bash start.sh` — it will auto-start PipraPay container.
+
+### Option 2: Manual VPS Setup
+
+If running on your own VPS with root access:
+
+```bash
+# Install requirements
+sudo apt-get update
+sudo apt-get install -y apache2 php php-mysql php-curl php-xml php-mbstring
+
+# Clone/setup PipraPay
+cd /var/www/
+sudo git clone https://github.com/PipraPay/PipraPay.git piprapay
+sudo chown -R www-data:www-data /var/www/piprapay
+
+# Configure Apache (point to piprapay directory)
+# Then access at http://YOUR-VPS-IP:8080
+```
+
+---
+
+## Configuration
+
+After PipraPay is running, get your API key:
+
+1. Go to **http://YOUR-PIPRAPAY-SERVER:8080/admin/**
+2. Login and go to **Settings → API Keys**
+3. Copy the API key
+
+Update `config.yaml`:
+
+```yaml
+piprapay:
+  base_url: "http://YOUR-PIPRAPAY-SERVER:8080"
+  api_key: "YOUR-API-KEY-HERE"
+```
 
 ---
 
@@ -22,41 +65,10 @@ Then:
 
 | Page | URL |
 |---|---|
+| Django App | `http://localhost:8000` |
 | Checkout | `http://localhost:8000/checkout/` |
-| Admin | `http://localhost:8000/admin/` |
-| Success | `http://localhost:8000/orders/success/` |
-| Failed | `http://localhost:8000/orders/failed/` |
-| Webhook | `http://localhost:8000/webhook/piprapay/` |
-
----
-
-## Setup
-
-### 1. Get PipraPay API Key
-
-1. Go to **https://demo.piprapay.com/admin/**
-2. Login: `demo` / `12345678`
-3. Go to **Settings → API Keys**
-4. Copy the API key
-
-### 2. Update config.yaml
-
-```bash
-nano config.yaml
-```
-
-Update the `api_key`:
-
-```yaml
-piprapay:
-  api_key: "YOUR-API-KEY-HERE"
-```
-
-### 3. Restart
-
-```bash
-python manage.py runserver 0.0.0.0:8000
-```
+| Django Admin | `http://localhost:8000/admin/` |
+| PipraPay Admin | `http://localhost:8080` |
 
 ---
 
@@ -64,18 +76,19 @@ python manage.py runserver 0.0.0.0:8000
 
 1. User submits checkout form (amount + gateway)
 2. Django creates Order in SQLite DB
-3. Django calls PipraPay API
-4. User redirected to bKash/Nagad page
-5. PipraPay calls webhook on Django
-6. Django updates order status
-7. User redirected to success page
+3. Django calls PipraPay API (`/api/v1/payment/create`)
+4. PipraPay returns payment URL (bKash/Nagad)
+5. User redirected to complete payment
+6. PipraPay calls `/webhook/piprapay/` on Django
+7. Django updates order status
+8. User redirected to success page
 
 ---
 
 ## Project Structure
 
 ```
-├── config.yaml              # Configuration (DB, PipraPay)
+├── config.yaml              # All configuration
 ├── requirements.txt
 ├── manage.py
 ├── start.sh                # Run everything with 1 command
@@ -87,5 +100,13 @@ python manage.py runserver 0.0.0.0:8000
 │   ├── views.py             # Checkout, webhook
 │   └── services/
 │       └── piprapay.py      # PipraPay API client
-└── piprapay/               # PipraPay source (for self-hosting)
+└── piprapay/               # PipraPay source
 ```
+
+---
+
+## Notes
+
+- **bKash/Nagad** require separate merchant accounts
+- PipraPay core is encrypted (IonCube), but plugins/themes are open-source
+- For local testing without real payments, use the demo server at `https://demo.piprapay.com`
