@@ -46,6 +46,7 @@ class PipraPayClient:
 
         try:
             response = requests.get(url, headers=self._headers(), timeout=30)
+            logger.error(f"[PipraPay] Response body: {response.text}")  
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

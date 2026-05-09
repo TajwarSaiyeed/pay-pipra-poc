@@ -6,7 +6,7 @@ sqlite:
 
 piprapay:
   base_url: "http://piprapay:80"
-  api_key: "SET-API-KEY-AFTER-PIPRAPAY-INSTALL"
+  api_key: "0c66547e116807985650e9eb5222a8a1c19830a6188e7a81a5"
   webhook_secret: "your-webhook-secret"
 
 app:

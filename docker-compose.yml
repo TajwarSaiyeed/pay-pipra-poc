@@ -32,6 +32,7 @@ services:
       - DB_PASSWORD=piprapay123
     volumes:
       - piprapay_data:/var/www/html/pp-content
+      - piprapay_config:/var/www/html/pp-config
 
   web:
     build:
@@ -55,3 +56,4 @@ services:
 volumes:
   mysql_data:
   piprapay_data:
+  piprapay_config:
