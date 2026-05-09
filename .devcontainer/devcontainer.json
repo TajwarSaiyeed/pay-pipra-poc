@@ -1,0 +1,23 @@
+{
+  "name": "PipraPay POC",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "web",
+  "workspaceFolder": "/workspaces/pay-pipra-poc",
+  "postCreateCommand": "bash start.sh",
+  "forwardPorts": [8000, 8080],
+  "portsAttributes": {
+    "8000": {
+      "label": "Django App",
+      "onAutoForward": "openPreview"
+    },
+    "8080": {
+      "label": "PipraPay Admin",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md", "config.yaml"]
+    }
+  }
+}
