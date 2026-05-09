@@ -23,8 +23,5 @@ echo " Checkout: http://localhost:8000/checkout/"
 echo " Admin: http://localhost:8000/admin/"
 echo "======================================"
 echo ""
-echo ">>> IMPORTANT: Update config.yaml with your PipraPay API key"
-echo ">>> Get key from: http://localhost:8080 (PipraPay admin)"
-echo ""
 
 python manage.py runserver 0.0.0.0:8000
