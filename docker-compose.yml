@@ -17,6 +17,19 @@ services:
     networks:
       - internal
 
+  piprapay:
+    build:
+      context: ./piprapay
+      dockerfile: Dockerfile
+    container_name: piprapay
+    ports:
+      - "8080:80"
+    volumes:
+      - ./piprapay/pp-content:/var/www/html/pp-content
+      - ./piprapay/pp-media:/var/www/html/pp-media
+    networks:
+      - internal
+
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000

@@ -3,17 +3,20 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "web",
   "workspaceFolder": "/app",
-  "postStartCommand": "pip install -r requirements.txt && python manage.py migrate",
-  "forwardPorts": [8000],
+  "postStartCommand": "pip install -r requirements.txt",
+  "forwardPorts": [
+    { "name": "Django", "port": 8000, "onAutoForward": "openPreview" },
+    { "name": "PipraPay", "port": 8080, "onAutoForward": "notify" },
+    { "name": "PostgreSQL", "port": 5432 }
+  ],
   "portsAttributes": {
-    "8000": {
-      "label": "Django App",
-      "onAutoForward": "openPreview"
-    }
+    "8000": { "label": "Django App", "onAutoForward": "openPreview" },
+    "8080": { "label": "PipraPay Admin" },
+    "5432": { "label": "PostgreSQL" }
   },
   "customizations": {
     "codespaces": {
-      "openFiles": ["README.md", "orders/views.py"]
+      "openFiles": ["README.md", "config.yaml"]
     }
   }
 }

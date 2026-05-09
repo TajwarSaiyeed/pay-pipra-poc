@@ -6,8 +6,8 @@ database:
   password: "postgres"
 
 piprapay:
-  base_url: "https://demo.piprapay.com"
-  api_key: "your-api-key"
+  base_url: "http://localhost:8080"
+  api_key: "your-piprapay-api-key"
   webhook_secret: "your-webhook-secret"
 
 app:
@@ -20,4 +20,3 @@ app:
     - "127.0.0.1"
     - "*.app.github.dev"
     - "*.preview.app.github.dev"
-  mock_mode: false
