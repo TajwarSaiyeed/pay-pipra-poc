@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - PipraPay POC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">PipraPay Checkout</h1>
+            <p class="text-gray-500 text-sm mb-6">Pay with bKash or Nagad</p>
+
+            {% if error %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'create_order_and_pay' %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Amount (BDT)</label>
+                    <input type="number" name="amount" step="1" min="1" placeholder="100"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Payment Method</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="gateway" value="bkash" class="peer sr-only" required>
+                            <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 text-center peer-checked:border-pink-500 peer-checked:bg-pink-50 transition">
+                                <div class="font-bold text-gray-800">bKash</div>
+                                <div class="text-xs text-gray-500 mt-1">Mobile Banking</div>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="gateway" value="nagad" class="peer sr-only" required>
+                            <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 text-center peer-checked:border-orange-500 peer-checked:bg-orange-50 transition">
+                                <div class="font-bold text-gray-800">Nagad</div>
+                                <div class="text-xs text-gray-500 mt-1">Mobile Banking</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
+                    Pay Now
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <a href="{% url 'admin:index' %}" class="text-sm text-gray-400 hover:text-gray-600">Admin Panel</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

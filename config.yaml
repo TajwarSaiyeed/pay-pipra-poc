@@ -1,0 +1,23 @@
+database:
+  host: "localhost"
+  port: 5432
+  name: "piprapay_poc"
+  user: "postgres"
+  password: "postgres"
+
+piprapay:
+  base_url: "https://demo.piprapay.com"
+  api_key: "your-api-key"
+  webhook_secret: "your-webhook-secret"
+
+app:
+  host: "0.0.0.0"
+  port: 8000
+  debug: true
+  secret_key: "django-insecure-change-me-in-production"
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "*.app.github.dev"
+    - "*.preview.app.github.dev"
+  mock_mode: false

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Payment Successful!</h1>
+            <p class="text-gray-500 mb-6">Your payment has been processed.</p>
+
+            {% if order %}
+            <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-500 text-sm">Order ID</span>
+                    <span class="text-gray-800 text-sm font-mono">{{ order.id }}</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-500 text-sm">Amount</span>
+                    <span class="text-gray-800 font-medium">{{ order.amount }} BDT</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-500 text-sm">Gateway</span>
+                    <span class="text-gray-800 text-sm">{{ order.gateway|upper }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500 text-sm">Status</span>
+                    <span class="text-green-600 text-sm font-medium uppercase">{{ order.status }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <a href="{% url 'checkout' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition">
+                Make Another Payment
+            </a>
+        </div>
+    </div>
+</body>
+</html>
