@@ -5,7 +5,7 @@ sqlite:
   path: "db.sqlite3"
 
 piprapay:
-  base_url: "http://localhost:8080"
+  base_url: "http://piprapay:80"
   api_key: "SET-API-KEY-AFTER-PIPRAPAY-INSTALL"
   webhook_secret: "your-webhook-secret"
 
