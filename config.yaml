@@ -1,13 +1,13 @@
 database:
-  type: "sqlite"  # Change to "postgresql" when using Docker
+  type: "sqlite"
 
 sqlite:
   path: "db.sqlite3"
 
 piprapay:
-  base_url: "http://localhost:8080"
-  api_key: "your-piprapay-api-key"
-  webhook_secret: "your-webhook-secret"
+  base_url: "https://demo.piprapay.com"
+  api_key: "GET-KEY-FROM-DEMO"
+  webhook_secret: "demo-webhook-secret"
 
 app:
   host: "0.0.0.0"
