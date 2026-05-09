@@ -1,110 +1,83 @@
 # PipraPay POC
 
-A Django proof-of-concept integrating **PipraPay** (self-hosted) with **bKash** and **Nagad** gateways. Everything runs on GitHub Codespaces.
+A Django proof-of-concept integrating **PipraPay** (self-hosted) with **bKash** and **Nagad** gateways.
 
 ---
 
-## Architecture
+## Quick Start
 
-```
-┌─────────────────────────────────────────────┐
-│              GitHub Codespaces              │
-│                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │  Django  │  │ PipraPay │  │    DB    │  │
-│  │ :8000    │  │  :8080   │  │ Postgres │  │
-│  └────┬─────┘  └────┬─────┘  └──────────┘  │
-│       │             │                       │
-│       └────────────┘                       │
-│    Django calls PipraPay API               │
-└─────────────────────────────────────────────┘
+### Without Docker (SQLite - recommended for Codespaces)
+
+```bash
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver 0.0.0.0:8000
 ```
 
----
+### With Docker (PostgreSQL)
 
-## Quick Start (GitHub Codespaces)
-
-1. Push to GitHub → **Code** → **Codespaces** → **Create codespace on main**
-2. Wait for Docker build to complete
-3. Open terminal and run:
-   ```bash
-   docker-compose exec web python manage.py migrate
-   docker-compose exec web python manage.py createsuperuser
-   ```
-4. Visit the Ports tab → port **8000** (Django) and **8080** (PipraPay admin)
+```bash
+cp config.yaml.docker config.yaml
+docker-compose up --build
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+```
 
 ---
 
-## Services
+## Ports
 
-| Service | URL | Purpose |
+| Service | Port | URL |
 |---|---|---|
-| Django App | `http://localhost:8000` | Checkout, webhook handler |
-| PipraPay Admin | `http://localhost:8080` | Payment gateway admin |
-| PostgreSQL | `:5432` | Orders database |
+| Django App | 8000 | `/checkout/` |
+| PipraPay Admin | 8080 | `/admin/` |
+| PostgreSQL | 5432 | (internal) |
 
 ---
 
-## Setup PipraPay (First Time)
+## Setup PipraPay
 
-1. Open PipraPay admin at `http://localhost:8080`
-2. Login with admin credentials (set during PipraPay install wizard)
-3. Go to **Settings → API Keys** → Create new API key
-4. Copy the API key
-5. Update `config.yaml`:
-   ```yaml
-   piprapay:
-     api_key: "your-api-key"
+1. Start PipraPay at port 8080:
+   ```bash
+   cd piprapay
+   docker build -t piprapay .
+   docker run -d -p 8080:80 --name piprapay piprapay
    ```
-6. Go to **Modules** → Install and configure **bKash** and **Nagad** plugins
+2. Go to `http://localhost:8080` → complete install wizard
+3. Settings → API Keys → copy key → paste in `config.yaml`
+4. Install bKash/Nagad plugins in PipraPay admin
 
 ---
 
-## Usage
+## Payment Flow
 
-- **Checkout**: `http://localhost:8000/checkout/`
-- **PipraPay Admin**: `http://localhost:8080/admin/`
-- **Django Admin**: `http://localhost:8000/admin/`
-
-### Payment Flow
-
-1. User submits checkout form (amount + gateway)
-2. Django creates Order in PostgreSQL
-3. Django calls `POST /api/v1/payment/create` on PipraPay
-4. PipraPay returns payment URL (bKash/Nagad page)
-5. User redirected to complete payment
-6. PipraPay calls `/webhook/piprapay/` on Django
-7. Django updates order status to `paid`
-8. User redirected to success page
+1. User submits checkout form
+2. Django creates Order in DB
+3. Django calls PipraPay `/api/v1/payment/create`
+4. User redirected to bKash/Nagad page
+5. PipraPay calls `/webhook/piprapay/` on Django
+6. Django updates order status to `paid`
+7. User redirected to success page
 
 ---
 
 ## Project Structure
 
 ```
-├── config.yaml              # All configuration
+├── config.yaml              # SQLite config (local)
+├── config.yaml.docker       # PostgreSQL config (Docker)
 ├── requirements.txt
 ├── manage.py
-├── Dockerfile              # Django
-├── docker-compose.yml      # Django + PipraPay + PostgreSQL
-├── PipraPayPOC/             # Django project
-│   ├── settings.py
+├── Dockerfile
+├── docker-compose.yml
+├── PipraPayPOC/
+│   ├── settings.py         # Auto-detects SQLite or PostgreSQL
 │   └── urls.py
-├── piprapay/               # PipraPay source (cloned from GitHub)
-│   └── Dockerfile
-├── orders/                  # Main Django app
-│   ├── models.py            # Order, Transaction
-│   ├── views.py             # Checkout, webhook
+├── orders/
+│   ├── models.py           # Order, Transaction
+│   ├── views.py           # Checkout, webhook
 │   └── services/
-│       └── piprapay.py      # PipraPay API client
-└── .devcontainer/
-    └── devcontainer.json
+│       └── piprapay.py     # PipraPay API client
+└── piprapay/              # PipraPay source
 ```
-
----
-
-## Notes
-
-- bKash/Nagad require separate merchant accounts from those services
-- For testing, you can skip webhooks and verify orders manually in Django admin
-- PipraPay core is encrypted (IonCube), but plugins/themes are open-source

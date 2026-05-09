@@ -50,17 +50,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PipraPayPOC.wsgi.application'
 
-db_config = config['database']
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': db_config['name'],
-        'USER': db_config['user'],
-        'PASSWORD': db_config['password'],
-        'HOST': db_config['host'],
-        'PORT': db_config['port'],
+db_type = config['database'].get('type', 'sqlite')
+
+if db_type == 'postgresql':
+    db_config = config['database']
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': db_config.get('name', 'piprapay_poc'),
+            'USER': db_config.get('user', 'postgres'),
+            'PASSWORD': db_config.get('password', 'postgres'),
+            'HOST': db_config.get('host', 'localhost'),
+            'PORT': db_config.get('port', 5432),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / config.get('sqlite', {}).get('path', 'db.sqlite3'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
