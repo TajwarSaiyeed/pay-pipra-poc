@@ -17,9 +17,9 @@ python manage.py migrate
 # Step 3: Build & Start PipraPay
 echo "[3/4] Building PipraPay container..."
 cd piprapay
-DOCKER_HOST="" /usr/bin/docker build -t piprapay .
-DOCKER_HOST="" /usr/bin/docker rm -f piprapay 2>/dev/null
-DOCKER_HOST="" /usr/bin/docker run -d -p 8080:80 --name piprapay piprapay
+docker build -t piprapay .
+docker rm -f piprapay 2>/dev/null
+docker run -d -p 8080:80 --name piprapay piprapay
 cd ..
 
 # Step 4: Start Django
