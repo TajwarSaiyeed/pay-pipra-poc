@@ -1,35 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: piprapay_poc
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - internal
-
-  piprapay:
-    build:
-      context: ./piprapay
-      dockerfile: Dockerfile
-    container_name: piprapay
-    ports:
-      - "8080:80"
-    volumes:
-      - ./piprapay/pp-content:/var/www/html/pp-content
-      - ./piprapay/pp-media:/var/www/html/pp-media
-    networks:
-      - internal
-
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
@@ -40,15 +11,4 @@ services:
     environment:
       - CONFIG_PATH=/app/config.yaml
       - PYTHONUNBUFFERED=1
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - internal
-
-networks:
-  internal:
-    driver: bridge
-
-volumes:
-  postgres_data:
+    workingDirectory: /app
