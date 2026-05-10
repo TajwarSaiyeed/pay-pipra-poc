@@ -13,22 +13,25 @@ class PipraPayClient:
 
     def _headers(self):
         return {
-            'Authorization': f'Bearer {self.api_key}',
+            'MHS-PIPRAPAY-API-KEY': self.api_key,
             'Content-Type': 'application/json',
         }
 
     def create_payment(self, order_id: str, amount: float, gateway: str,
-                       redirect_url: str, webhook_url: str, currency: str = 'BDT'):
+                       redirect_url: str, webhook_url: str, currency: str = 'BDT',
+                       full_name: str = '', email: str = '', mobile: str = ''):
         payload = {
-            'order_id': str(order_id),
+            'full_name': full_name or str(order_id),
+            'email_address': email or '',
+            'mobile_number': mobile or '',
             'amount': amount,
             'currency': currency,
             'gateway': gateway,
-            'redirect_url': redirect_url,
+            'return_url': redirect_url,
             'webhook_url': webhook_url,
         }
 
-        url = f'{self.base_url}/api/v1/payment/create'
+        url = f'{self.base_url}/api/checkout/redirect'
         logger.info(f"[PipraPay] Creating payment: {payload}")
 
         try:

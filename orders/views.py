@@ -23,6 +23,9 @@ def create_order_and_pay(request):
         try:
             amount = float(request.POST.get('amount', 0))
             gateway = request.POST.get('gateway', '')
+            full_name = request.POST.get('full_name', f'Customer-{uuid.uuid4().hex[:8]}')
+            email = request.POST.get('email', '')
+            mobile = request.POST.get('mobile', '')
 
             if amount <= 0:
                 return render(request, 'orders/checkout.html', {
@@ -35,22 +38,35 @@ def create_order_and_pay(request):
                 gateway=gateway,
             )
 
-            scheme = 'https' if request.is_secure() else 'http'
-            host = request.get_host()
-            redirect_url = f"{scheme}://{host}/orders/success/?order_id={order.id}"
-            webhook_url = f"{scheme}://{host}/webhook/piprapay/"
+            public_host = 'special-space-fiesta-q5rr695pq9xcr6v-8000.app.github.dev'
+            redirect_url = f"https://{public_host}/orders/success/?order_id={order.id}"
+            webhook_url = f"https://{public_host}/webhook/piprapay/"
 
             try:
+                email = request.POST.get('email', '')
+                if not email or '@' not in email:
+                    email = f'customer-{order.id}@example.com'
+                mobile = request.POST.get('mobile', '')
+                if not mobile:
+                    mobile = '01712345678'
                 response = piprapay_client.create_payment(
                     order_id=str(order.id),
                     amount=amount,
                     gateway=gateway,
                     redirect_url=redirect_url,
                     webhook_url=webhook_url,
+                    full_name=request.POST.get('full_name', f'Customer-{order.id}'),
+                    email=email,
+                    mobile=mobile,
                 )
 
-                transaction_id = response.get('transaction_id', str(uuid.uuid4()))
-                payment_url = response.get('payment_url', '')
+                transaction_id = response.get('pp_id', str(uuid.uuid4()))
+                payment_url = response.get('pp_url', '').replace('\\/', '/')
+
+                if payment_url.startswith('http://localhost:8080'):
+                    payment_url = payment_url.replace('http://localhost:8080', 'https://special-space-fiesta-q5rr695pq9xcr6v-8080.app.github.dev')
+                elif payment_url.startswith('http://piprapay/'):
+                    payment_url = payment_url.replace('http://piprapay/', 'https://special-space-fiesta-q5rr695pq9xcr6v-8080.app.github.dev/')
 
                 Transaction.objects.create(
                     order=order,
